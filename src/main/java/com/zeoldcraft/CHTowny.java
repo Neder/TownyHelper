@@ -93,7 +93,7 @@ public class CHTowny {
 	
 
 	public static CArray get_town_info(Town town, Target t) {
-		CArray town_array = new CArray(t);
+//		CArray town_array = new CArray(t);
 		CArray atown = new CArray(t);
 		atown.set("mayor", new CString(town.getMayor().getName(), t), t);
 		CArray assis = new CArray(t);
@@ -103,24 +103,24 @@ public class CHTowny {
 		atown.set("assistants", assis, t);
 		CArray resis = new CArray(t);
 		for (Resident res : town.getResidents()) {
-			assis.push(new CString(res.getName(), t));
+			resis.push(new CString(res.getName(), t));
 		}
 		atown.set("residents", resis, t);
 		Construct nation;
 		try {
 			nation = new CString(town.getNation().getName(), t);
 		} catch (NotRegisteredException nre) {
-			nation = new CNull(t);
+			nation = CNull.NULL;
 		}
 		atown.set("nation", nation, t);
 		Construct spawn;
 		try {
 			spawn = ObjectGenerator.GetGenerator().location(new BukkitMCLocation(town.getSpawn()));
 		} catch (TownyException e) {
-			spawn = new CNull(t);
+			spawn = CNull.NULL;
 		}
-		atown.set("spawn", spawn, t);	
-		return town_array;
+		atown.set("spawn", spawn, t);
+		return atown;
 	}
 	
 	public static TownBlock block_from_locArray(Construct array, Target t) {
@@ -174,12 +174,12 @@ public class CHTowny {
 					try {
 						return new CString(blocks.get(i).getTown().getName(), t);
 					} catch (NotRegisteredException e) {
-						return new CNull(t);
+						return CNull.NULL;
 					}
 				}
 			}
 
-			return new CNull(t);
+			return CNull.NULL;
 		}
 
 		public Integer[] numArgs() {
@@ -241,7 +241,12 @@ public class CHTowny {
 	public static class towny_canbuild extends TownyFunction {
 
 		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
-			return new CBoolean(construct(args[0], args[1], ActionType.BUILD, t), t);
+			if (construct(args[0], args[1], ActionType.BUILD, t)) {
+				return CBoolean.TRUE;
+			} else {
+				return CBoolean.FALSE;
+			}
+
 		}
 
 		public Integer[] numArgs() {
@@ -257,7 +262,11 @@ public class CHTowny {
 	public static class towny_canbreak extends TownyFunction {
 
 		public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
-			return new CBoolean(construct(args[0], args[1], ActionType.DESTROY, t), t);
+			if (construct(args[0], args[1], ActionType.DESTROY, t)) {
+				return CBoolean.TRUE;
+			} else {
+				return CBoolean.FALSE;
+			}
 		}
 
 		public Integer[] numArgs() {
